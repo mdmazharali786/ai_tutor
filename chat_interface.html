@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .chat-container {
+            max-width: 400px;
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .chat-messages {
+            padding: 10px;
+            overflow-y: scroll;
+            max-height: 300px;
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        
+        .chat-input input[type="text"] {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            margin-right: 10px;
+        }
+        
+        .chat-input button {
+            padding: 8px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .chat-input button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="chat-container">
+        <div class="chat-header">
+            Chatbot
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <p>Welcome to Student! I am your Virtual Computer Science Tutor.</p>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="user-input" placeholder="Type your message...">
+            <button id="send-btn">Send</button>
+        </div>
+    </div>
+
+
+    <script>
+        // Function to handle sending user messages
+        async function sendMessage(id) {
+            var userInput = document.getElementById('user-input').value;
+            var chatMessages = document.getElementById('chat-messages');
+            const baseUrl = "http://127.0.0.1:8000"; // Replace with your API endpoint
+            const params = {
+                'chat_id': id,
+                'question': userInput
+            };
+
+
+            // Display user message in chat interface
+            chatMessages.innerHTML += '<p><strong>You:</strong> ' + userInput + '</p>';
+
+            const response = await fetch(baseUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json", // Indicate JSON in the body
+                },
+                body: JSON.stringify(params), // Convert parameters to JSON string
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            // Clear input field
+            document.getElementById('user-input').value = '';
+
+            // Simulate chatbot response (replace with actual chatbot logic)
+            setTimeout(function() {
+                chatMessages.innerHTML += '<p><strong>AI Tutor:</strong> ' + data['response'] + '</p>';
+                // Scroll to bottom of chat container
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 500);
+        }
+        const uniq_id = crypto.randomUUID()
+            // Event listener for send button click
+        document.getElementById('send-btn').addEventListener('click', function() {
+            sendMessage(uniq_id);
+        });
+
+        // Event listener for pressing Enter key in input field
+        document.getElementById('user-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage(uniq_id);
+            }
+        });
+    </script>
+
+</body>
+
+</html>
